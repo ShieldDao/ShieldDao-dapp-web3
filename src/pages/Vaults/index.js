@@ -26,7 +26,7 @@ const VaultsPage = () => {
         <VaultCard
           name="Tether US"
           ticker="USDT"
-          apy="548%"
+          apy="896%"
           logo="/images/USDT-logo.ede9da70.png"
         />
       </VaultsRow>
