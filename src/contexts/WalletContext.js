@@ -1,6 +1,7 @@
 import { createContext, useEffect, useState } from 'react';
 import Web3 from 'web3';
 import Web3Modal from 'web3modal';
+import { convertUtf8ToHex } from '@walletconnect/utils';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import { apiGetAccountAssets } from '../helpers/api';
 import {
