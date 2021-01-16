@@ -12,6 +12,7 @@ import {
   formatTestTransaction,
   getChainData,
 } from '../helpers/utils';
+import { notification } from 'antd';
 
 const INITIAL_STATE = {
   connected: false,
@@ -83,7 +84,7 @@ const WalletProvider = (props) => {
 
   const web3Modal = new Web3Modal({
     network: getNetwork(),
-    cacheProvider: true,
+    cacheProvider: false,
     providerOptions: getProviderOptions(),
   });
 
@@ -91,7 +92,8 @@ const WalletProvider = (props) => {
     if (web3 && web3.currentProvider && web3.currentProvider.close) {
       await web3.currentProvider.close();
     }
-    await web3Modal.clearCachedProvider();
+
+    web3Modal.clearCachedProvider();
     setConnected(false);
     setFetching(false);
     setAddress(null);
@@ -109,11 +111,12 @@ const WalletProvider = (props) => {
     if (!provider.on) {
       return;
     }
-    provider.on('close', () => resetApp());
+
     provider.on('accountsChanged', async (accounts) => {
       setAddress(await accounts[0]);
       await getAccountAssets();
     });
+
     provider.on('chainChanged', async (chainId) => {
       const networkId = await web3.eth.net.getId();
       setNetworkId(networkId);
@@ -121,35 +124,41 @@ const WalletProvider = (props) => {
       await getAccountAssets();
     });
 
-    provider.on('networkChanged', async (networkId) => {
-      const chainId = await web3.eth.chainId();
-      setNetworkId(networkId);
-      setChainId(chainId);
-      await getAccountAssets();
+    provider.on('connect', (info) => {
+      console.info('Connected');
+    });
+
+    provider.on('disconnect', (error) => {
+      console.info('Disconnected');
+      resetApp();
     });
   };
 
   const onConnect = async () => {
-    const provider = await web3Modal.connect();
+    try {
+      const provider = await web3Modal.connect();
+      await subscribeProvider(provider);
+      const web3 = initWeb3(provider);
+      const accounts = await web3.eth.getAccounts();
+      const address = accounts[0];
+      const networkId = await web3.eth.net.getId();
+      const chainId = await web3.eth.chainId();
 
-    await subscribeProvider(provider);
-    const web3 = initWeb3(provider);
-
-    const accounts = await web3.eth.getAccounts();
-
-    const address = accounts[0];
-
-    const networkId = await web3.eth.net.getId();
-
-    const chainId = await web3.eth.chainId();
-
-    setWeb3(web3);
-    setProvider(provider);
-    setConnected(true);
-    setAddress(address);
-    setChainId(chainId);
-    setNetworkId(networkId);
-    await getAccountAssets();
+      setWeb3(web3);
+      setProvider(provider);
+      setConnected(true);
+      setAddress(address);
+      setChainId(chainId);
+      setNetworkId(networkId);
+      await getAccountAssets();
+    } catch (err) {
+      // console.error(Object.keys(err));
+      if (err?.message) {
+        notification.error({
+          message: err.message,
+        });
+      }
+    }
   };
 
   const getAccountAssets = async () => {
@@ -170,6 +179,8 @@ const WalletProvider = (props) => {
     if (web3Modal?.cachedProvider) {
       onConnect();
     }
+
+    return () => {};
   }, []);
 
   return (
