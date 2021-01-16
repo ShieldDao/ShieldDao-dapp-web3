@@ -46,7 +46,7 @@ const WalletConnect = () => {
           </figure>
 
           <div className="content">
-            <SAddress>{ellipseAddress(address)}</SAddress>
+            <SAddress>{address && ellipseAddress(address)}</SAddress>
             <Button onClick={() => resetApp()} type="text" size="small" danger>
               Disconnect
             </Button>

@@ -25,7 +25,8 @@ const StyledNav = styled.nav`
     padding: 0 16px;
 
     &.active {
-      box-shadow: rgb(31, 199, 212) 4px 0px 0px inset;
+      box-shadow: rgb(31, 199, 212) -4px 0px 0px inset;
+      background-color: #f9f9f9;
     }
 
     svg {
