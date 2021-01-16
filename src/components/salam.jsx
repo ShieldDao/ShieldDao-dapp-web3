@@ -1,5 +1,5 @@
 const Salam = () => {
-    return (<div>Salam</div>)
+    return (<div id="about">Aboutus</div>)
 }
 
 export default Salam

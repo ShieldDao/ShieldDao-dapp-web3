@@ -1,12 +1,13 @@
 import { StrictMode } from 'react';
 import ReactDOM from 'react-dom';
-import Header from './components/commons/header';
 import App from './pages/App';
+import Providers from './Providers';
 
 ReactDOM.render(
   <StrictMode>
-    <Header />
-    <App />
+    <Providers>
+      <App />
+    </Providers>
   </StrictMode>,
   document.getElementById('root')
 );

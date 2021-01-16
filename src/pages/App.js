@@ -1,15 +1,21 @@
 import { Suspense } from 'react';
-import { HashRouter, Route, Switch } from 'react-router-dom';
+import { HashRouter, Switch } from 'react-router-dom';
+import DWRoute from '../DWRoute';
 import '../static/css/App.css';
 import 'antd/dist/antd.css';
-import Salam from '../components/salam';
+import routes from './routes';
+import AppLayout from './AppLayout';
 
 function App() {
   return (
     <Suspense fallback={null}>
       <HashRouter>
         <Switch>
-          <Route exact strict path="/" component={Salam} />
+          <AppLayout>
+            {routes.map((route, i) => {
+              return <DWRoute key={i} {...route} />;
+            })}
+          </AppLayout>
         </Switch>
       </HashRouter>
     </Suspense>
