@@ -1,17 +1,15 @@
-import { createContext, useEffect, useState } from 'react';
+import {
+  createContext,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import Web3 from 'web3';
 import Web3Modal from 'web3modal';
-import { convertUtf8ToHex } from '@walletconnect/utils';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import { apiGetAccountAssets } from '../helpers/api';
-import { openBox, getProfile } from '../helpers/box';
-import {
-  hashPersonalMessage,
-  recoverPublicKey,
-  recoverPersonalSignature,
-  formatTestTransaction,
-  getChainData,
-} from '../helpers/utils';
+import { getChainData } from '../helpers/utils';
 import { notification } from 'antd';
 
 const INITIAL_STATE = {
@@ -70,7 +68,9 @@ const WalletProvider = (props) => {
   const [pendingRequest, setPendingRequest] = useState(false);
   const [result, setResult] = useState(null);
 
-  const getNetwork = () => getChainData(chainId).network;
+  const getNetwork = useCallback(() => getChainData(chainId).network, [
+    chainId,
+  ]);
   const getProviderOptions = () => {
     return {
       walletconnect: {
@@ -82,13 +82,15 @@ const WalletProvider = (props) => {
     };
   };
 
-  const web3Modal = new Web3Modal({
-    network: getNetwork(),
-    cacheProvider: false,
-    providerOptions: getProviderOptions(),
-  });
+  const web3Modal = useMemo(() => {
+    return new Web3Modal({
+      network: getNetwork(),
+      cacheProvider: false,
+      providerOptions: getProviderOptions(),
+    });
+  }, [getNetwork]);
 
-  const resetApp = async () => {
+  const resetApp = useCallback(async () => {
     if (web3 && web3.currentProvider && web3.currentProvider.close) {
       await web3.currentProvider.close();
     }
@@ -105,36 +107,53 @@ const WalletProvider = (props) => {
     setShowModal(false);
     setPendingRequest(false);
     setResult(null);
-  };
+  }, [web3, web3Modal]);
 
-  const subscribeProvider = async (provider) => {
-    if (!provider.on) {
-      return;
+  const getAccountAssets = useCallback(async () => {
+    setFetching(true);
+    try {
+      // get account balances
+      const assets = await apiGetAccountAssets(address, chainId);
+
+      setAssets(assets);
+      setFetching(false);
+    } catch (error) {
+      console.error(error); // tslint:disable-line
+      setFetching(false);
     }
+  }, [address, chainId]);
 
-    provider.on('accountsChanged', async (accounts) => {
-      setAddress(await accounts[0]);
-      await getAccountAssets();
-    });
+  const subscribeProvider = useCallback(
+    async (provider) => {
+      if (!provider.on) {
+        return;
+      }
 
-    provider.on('chainChanged', async (chainId) => {
-      const networkId = await web3.eth.net.getId();
-      setNetworkId(networkId);
-      setChainId(chainId);
-      await getAccountAssets();
-    });
+      provider.on('accountsChanged', async (accounts) => {
+        setAddress(await accounts[0]);
+        await getAccountAssets();
+      });
 
-    provider.on('connect', (info) => {
-      console.info('Connected');
-    });
+      provider.on('chainChanged', async (chainId) => {
+        const networkId = await web3.eth.net.getId();
+        setNetworkId(networkId);
+        setChainId(chainId);
+        await getAccountAssets();
+      });
 
-    provider.on('disconnect', (error) => {
-      console.info('Disconnected');
-      resetApp();
-    });
-  };
+      provider.on('connect', () => {
+        console.info('Connected');
+      });
 
-  const onConnect = async () => {
+      provider.on('disconnect', () => {
+        console.info('Disconnected');
+        resetApp();
+      });
+    },
+    [getAccountAssets, resetApp, web3?.eth?.net]
+  );
+
+  const onConnect = useCallback(async () => {
     try {
       const provider = await web3Modal.connect();
       await subscribeProvider(provider);
@@ -159,21 +178,7 @@ const WalletProvider = (props) => {
         });
       }
     }
-  };
-
-  const getAccountAssets = async () => {
-    setFetching(true);
-    try {
-      // get account balances
-      const assets = await apiGetAccountAssets(address, chainId);
-
-      setAssets(assets);
-      setFetching(false);
-    } catch (error) {
-      console.error(error); // tslint:disable-line
-      setFetching(false);
-    }
-  };
+  }, [getAccountAssets, subscribeProvider, web3Modal]);
 
   useEffect(() => {
     if (web3Modal?.cachedProvider) {
@@ -181,7 +186,7 @@ const WalletProvider = (props) => {
     }
 
     return () => {};
-  }, []);
+  }, [connected, onConnect, web3Modal?.cachedProvider]);
 
   return (
     <walletContext.Provider
