@@ -22,7 +22,7 @@ const StyledNav = styled.nav`
     }
 
     li ul a {
-      padding-left: 35px;
+      padding-left: 49px;
       height: 38px;
       font-size: 13px;
     }
@@ -43,12 +43,9 @@ const StyledNav = styled.nav`
     }
 
     svg {
-      width: 1.7em;
-      height: 1.7em;
-
       &.arrow-down {
-        width: 1em;
-        height: 1em;
+        width: 0.7em;
+        height: 0.7em;
       }
     }
 
@@ -74,8 +71,8 @@ const NavLinks = () => {
           title="Info"
           children={[
             {
-              title: 'ShieldDao Website',
-              href: 'https://shielddao.app',
+              title: 'Tokenomics',
+              href: 'https://shielddao.app/tokenomics/',
             },
           ]}
         />

@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import NavLinks from './NavLinks';
+import SidebarFooter from './SidebarFooter';
 
 const StyledSidebar = styled.aside`
   position: fixed;
@@ -9,6 +10,14 @@ const StyledSidebar = styled.aside`
   top: 0;
   width: 240px;
   border-right: 2px solid #f3f3f3;
+  display: flex;
+  flex-direction: column;
+
+  nav {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+  }
 
   a {
     color: #374151;
@@ -25,6 +34,7 @@ const Sidebar = () => {
   return (
     <StyledSidebar>
       <NavLinks />
+      <SidebarFooter />
     </StyledSidebar>
   );
 };
