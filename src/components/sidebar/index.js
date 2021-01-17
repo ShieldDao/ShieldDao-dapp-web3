@@ -9,6 +9,16 @@ const StyledSidebar = styled.aside`
   top: 0;
   width: 240px;
   border-right: 2px solid #f3f3f3;
+
+  a {
+    color: #374151;
+    font-weight: 500;
+    font-size: 14px;
+
+    svg {
+      fill: #485975;
+    }
+  }
 `;
 
 const Sidebar = () => {

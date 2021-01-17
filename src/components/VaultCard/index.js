@@ -11,7 +11,6 @@ const SVaultCard = styled.div`
   padding: 30px;
   max-width: 450px;
   width: 100%;
-  margin: 0 15px;
   position: relative;
   overflow: hidden;
 
