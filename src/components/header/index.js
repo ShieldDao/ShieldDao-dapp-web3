@@ -14,8 +14,11 @@ const SiteHeader = styled.header`
   border-bottom: 2px solid #f3f3f3;
   height: 64px;
   padding: 0 15px;
-  position: relative;
-  z-index: 3;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 7;
+  width: 100%;
   background-color: #fff;
 `;
 

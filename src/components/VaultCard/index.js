@@ -1,5 +1,7 @@
 import { Button } from 'antd';
+import { useState } from 'react';
 import styled from 'styled-components';
+import DepositNWithdraw from './DepositNWithdraw';
 
 const SVaultCard = styled.div`
   border: 1px solid #e7e7e7;
@@ -114,6 +116,7 @@ const SVaultCard = styled.div`
 `;
 
 const VaultCard = ({ name, ticker, logo, apy }) => {
+  const [modalVisible, setModalVisible] = useState(false);
   return (
     <SVaultCard>
       <header>
@@ -158,9 +161,11 @@ const VaultCard = ({ name, ticker, logo, apy }) => {
         </li>
       </ul>
 
-      <Button size="large" type="primary">
+      <Button size="large" type="primary" onClick={() => setModalVisible(true)}>
         Deposit and Withdraw
       </Button>
+
+      <DepositNWithdraw setVisible={setModalVisible} visible={modalVisible} />
     </SVaultCard>
   );
 };

@@ -7,7 +7,7 @@ const StyledAppBodyWrap = styled.div`
 `;
 
 const StyledAppMain = styled.main`
-  padding: 30px 30px 30px 272px;
+  padding: 80px 30px 30px 272px;
 `;
 
 const AppLayout = ({ children }) => {
